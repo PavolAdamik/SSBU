@@ -70,13 +70,14 @@ class Experiment:
 
         # Train and evaluate the model
         trainer.train(X_train, y_train)
-        accuracy, f1, roc_auc, predictions = trainer.evaluate(X_test, y_test)
+        accuracy, f1, roc_auc, predictions, sensitivity = trainer.evaluate(X_test, y_test)
+        conf_matrix = confusion_matrix(y_test, predictions)
 
-        self.store_results(model_name, replication, accuracy, f1, roc_auc, best_params)
+        self.store_results(model_name, replication, accuracy, f1, roc_auc, sensitivity, best_params)
+        self.replication_conf_matrices[model_name].append(conf_matrix)
         # Append the confusion matrix to the list for this model
-        self.replication_conf_matrices[model_name].append(confusion_matrix(y_test, predictions))
 
-    def store_results(self, model_name, replication, accuracy, f1, roc_auc, best_params):
+    def store_results(self, model_name, replication, accuracy, f1, roc_auc,sensitivity, best_params):
         """Store the results of a single evaluation."""
         new_row = pd.DataFrame({
             'model': model_name,
@@ -84,12 +85,13 @@ class Experiment:
             'accuracy': accuracy,
             'f1_score': f1,
             'roc_auc': roc_auc,
+            'sensitivity': sensitivity,
             'best_params': [best_params]
         })
         self.results = pd.concat([self.results, new_row], ignore_index=True)
         logging.info(
             f"{model_name}, Replication: {replication}, Accuracy: {accuracy:.4f}, F1: {f1:.4f}, "
-            f"ROC AUC: {roc_auc:.4f},  Params: {best_params}")
+            f"ROC AUC: {roc_auc:.4f}, Sensitivity: {sensitivity:.4f} ,  Params: {best_params}")
 
     def calculate_mean_conf_matrices(self):
         """Calculate the mean confusion matrix for each model."""

@@ -5,7 +5,7 @@ import seaborn as sns
 class Plotter:
     """A class for plotting the results of machine learning experiments."""
 
-    def plot_metric_density(self, results, metrics=('accuracy', 'f1_score', 'roc_auc')):
+    def plot_metric_density(self, results, metrics=('accuracy', 'f1_score', 'roc_auc', 'sensitivity')):
         """
         Plot density plots for specified metrics.
 
@@ -13,6 +13,7 @@ class Plotter:
         - results: DataFrame containing the results.
         - metrics: List of metrics to plot.
         """
+        title = 'Metric Density'
         fig, axes = plt.subplots(nrows=1, ncols=len(metrics), figsize=(20, 5))
         for i, metric in enumerate(metrics):
             ax = axes[i]
@@ -24,6 +25,7 @@ class Plotter:
             if i == 0:
                 ax.legend()
         plt.tight_layout()
+        plt.savefig(f"{title}.png")
         plt.show()
 
     def plot_evaluation_metric_over_replications(self, all_metric_results, title, metric_name):
@@ -43,6 +45,7 @@ class Plotter:
         plt.xlabel('Replication')
         plt.ylabel(metric_name)
         plt.legend()
+        plt.savefig(f"{title}.png")
         plt.show()
 
     def plot_confusion_matrices(self, confusion_matrices):
@@ -52,12 +55,14 @@ class Plotter:
         Parameters:
         - confusion_matrices: Dict containing the average confusion matrix for each model.
         """
+        title = 'Confusion matrix'
         for model_name, matrix in confusion_matrices.items():
             plt.figure(figsize=(6, 5))
             sns.heatmap(matrix, annot=True, fmt='.2f', cmap='Blues', cbar=False)
             plt.title(f'Average Confusion Matrix: {model_name}')
             plt.xlabel('Predicted label')
             plt.ylabel('True label')
+            plt.savefig(f"{title}.png")
             plt.show()
 
     def print_best_parameters(self, results):
